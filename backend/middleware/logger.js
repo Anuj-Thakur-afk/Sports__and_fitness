@@ -1,8 +1,7 @@
 // /backend/middleware/logger.js
 const logger = (req, res, next) => {
-  const now = new Date().toISOString();
-  console.log(`[${now}] ${req.method} ${req.originalUrl}`);
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
   next();
 };
 
-module.exports = logger;
+export default logger;

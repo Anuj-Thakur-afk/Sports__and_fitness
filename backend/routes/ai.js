@@ -1,9 +1,10 @@
 // /backend/routes/ai.js
-const express = require('express');
+import express from 'express';
+import OpenAI from 'openai';
+import Suggestion from '../models/Suggestion.js';
+import { protect } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const OpenAI = require('openai');
-const Suggestion = require('../models/Suggestion');
-const { protect } = require('../middleware/authMiddleware');
 
 router.use(protect);
 
@@ -134,4 +135,4 @@ Target: ~2,800 cal/day | High protein (1.6g/kg body weight)`;
 Target: ~2,200 cal/day | Balanced macros`;
 }
 
-module.exports = router;
+export default router;

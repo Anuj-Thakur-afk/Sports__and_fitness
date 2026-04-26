@@ -1,5 +1,5 @@
 // /backend/models/Goal.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const GoalSchema = new mongoose.Schema({
   user: {
@@ -31,4 +31,4 @@ const GoalSchema = new mongoose.Schema({
 // Compound index: one goal entry per user per date
 GoalSchema.index({ user: 1, date: 1 }, { unique: true });
 
-module.exports = mongoose.model('Goal', GoalSchema);
+export default mongoose.model('Goal', GoalSchema);

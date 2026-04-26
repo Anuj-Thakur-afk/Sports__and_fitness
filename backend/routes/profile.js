@@ -1,8 +1,9 @@
 // /backend/routes/profile.js
-const express = require('express');
+import express from 'express';
+import User from '../models/User.js';
+import { protect } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const User = require('../models/User');
-const { protect } = require('../middleware/authMiddleware');
 
 router.use(protect);
 
@@ -45,4 +46,4 @@ router.put('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

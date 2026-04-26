@@ -1,8 +1,9 @@
 // /backend/routes/goal.js
-const express = require('express');
+import express from 'express';
+import Goal from '../models/Goal.js';
+import { protect } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const Goal = require('../models/Goal');
-const { protect } = require('../middleware/authMiddleware');
 
 router.use(protect);
 
@@ -73,4 +74,4 @@ router.put('/progress', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

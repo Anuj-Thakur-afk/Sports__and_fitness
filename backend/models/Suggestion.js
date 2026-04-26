@@ -1,5 +1,5 @@
 // /backend/models/Suggestion.js
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const SuggestionSchema = new mongoose.Schema({
   user: {
@@ -15,4 +15,4 @@ const SuggestionSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-module.exports = mongoose.model('Suggestion', SuggestionSchema);
+export default mongoose.model('Suggestion', SuggestionSchema);

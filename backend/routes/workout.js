@@ -1,8 +1,9 @@
 // /backend/routes/workout.js
-const express = require('express');
+import express from 'express';
+import Workout from '../models/Workout.js';
+import { protect } from '../middleware/authMiddleware.js';
+
 const router = express.Router();
-const Workout = require('../models/Workout');
-const { protect } = require('../middleware/authMiddleware');
 
 // All routes require authentication
 router.use(protect);
@@ -131,4 +132,4 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
