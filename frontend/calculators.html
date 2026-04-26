@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitLife – Calculators</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      FitLife <span class="dot"></span>
+    </div>
+    <div class="navbar-actions">
+      <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-section">Main Menu</div>
+      <ul class="sidebar-nav">
+        <li><a href="dashboard.html"><span>📊</span> Dashboard</a></li>
+        <li><a href="goal.html"><span>🎯</span> Daily Goals</a></li>
+        <li><a href="ai.html"><span>🧠</span> AI Coach</a></li>
+        <li><a href="chat.html"><span>💬</span> Community Chat</a></li>
+        <li><a href="calculators.html" class="active"><span>🧮</span> Calculators</a></li>
+      </ul>
+      <div class="sidebar-section">Account</div>
+      <ul class="sidebar-nav">
+        <li><a href="profile.html"><span>👤</span> Profile</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Fitness Calculators</h1>
+        <p>Calculate your BMI, daily calorie needs, and more.</p>
+      </div>
+
+      <div class="content-grid">
+        <!-- BMI Calculator -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🧮 BMI Calculator</h2>
+          </div>
+          <form id="bmiForm">
+            <div class="form-group">
+              <label class="form-label">Height (cm)</label>
+              <input type="number" id="bmiHeight" class="form-control" placeholder="e.g. 175" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Weight (kg)</label>
+              <input type="number" id="bmiWeight" class="form-control" placeholder="e.g. 70" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Calculate BMI</button>
+          </form>
+          
+          <div id="bmiResult" class="mt-3" style="display: none; text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Your BMI is</div>
+            <div id="bmiValue" style="font-size: 2.5rem; font-weight: 700; color: var(--neon-green); font-family: 'Space Grotesk', sans-serif;"></div>
+            <div id="bmiCategory" style="font-weight: 600; margin-top: 0.5rem; font-size: 1.1rem;"></div>
+          </div>
+        </div>
+
+        <!-- TDEE Calculator -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">🔥 Daily Calorie Needs (TDEE)</h2>
+          </div>
+          <form id="tdeeForm">
+            <div class="form-group flex gap-2">
+              <div style="flex: 1;">
+                <label class="form-label">Age</label>
+                <input type="number" id="tdeeAge" class="form-control" placeholder="Years" required>
+              </div>
+              <div style="flex: 1;">
+                <label class="form-label">Gender</label>
+                <select id="tdeeGender" class="form-control" required>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group flex gap-2">
+              <div style="flex: 1;">
+                <label class="form-label">Height (cm)</label>
+                <input type="number" id="tdeeHeight" class="form-control" placeholder="e.g. 175" required>
+              </div>
+              <div style="flex: 1;">
+                <label class="form-label">Weight (kg)</label>
+                <input type="number" id="tdeeWeight" class="form-control" placeholder="e.g. 70" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Activity Level</label>
+              <select id="tdeeActivity" class="form-control" required>
+                <option value="1.2">Sedentary (little to no exercise)</option>
+                <option value="1.375">Lightly active (1-3 days/week)</option>
+                <option value="1.55">Moderately active (3-5 days/week)</option>
+                <option value="1.725">Very active (6-7 days/week)</option>
+                <option value="1.9">Extra active (very active + physical job)</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-outline btn-block">Calculate Needs</button>
+          </form>
+
+          <div id="tdeeResult" class="mt-3" style="display: none; text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.03); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.9rem; color: var(--text-muted);">Maintenance Calories</div>
+            <div id="tdeeValue" style="font-size: 2.5rem; font-weight: 700; color: var(--orange-500); font-family: 'Space Grotesk', sans-serif;"></div>
+            <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem;">kcal / day</div>
+            <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: left;">
+              <div class="flex justify-between mb-1"><span>Weight Loss:</span> <strong style="color: var(--text-main);">-500 kcal</strong></div>
+              <div class="flex justify-between"><span>Weight Gain:</span> <strong style="color: var(--text-main);">+500 kcal</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="js/calculators.js"></script>
+</body>
+</html>

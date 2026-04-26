@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard – FitLife</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <div class="logo-icon">💪</div>
+      FitLife
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="dashboard.html" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+      <li><a href="goal.html"><span class="nav-icon">📅</span> Goals</a></li>
+      <li><a href="ai.html"><span class="nav-icon">🧠</span> AI Coach</a></li>
+      <li><a href="chat.html"><span class="nav-icon">💬</span> Chat</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <span id="navUserName" style="font-size:0.875rem; color:var(--gray-500); font-weight:500;"></span>
+      <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <ul class="sidebar-nav">
+        <li><span class="sidebar-section">Main</span></li>
+        <li><a href="dashboard.html" class="active"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+        <li><span class="sidebar-section">Fitness</span></li>
+        <li><a href="goal.html"><span class="nav-icon">📅</span> Daily Goals</a></li>
+        <li><a href="ai.html"><span class="nav-icon">🧠</span> AI Coach</a></li>
+        <li><a href="chat.html"><span class="nav-icon">💬</span> Community Chat</a></li>
+        <li><a href="calculators.html"><span class="nav-icon">🧮</span> Calculators</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Dashboard 📊</h1>
+        <p id="greetingText">Loading your stats...</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon green">🏋️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="totalWorkouts">–</div>
+            <div class="stat-label">Total Workouts</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon orange">🔥</div>
+          <div class="stat-info">
+            <div class="stat-value" id="totalCalories">–</div>
+            <div class="stat-label">Calories Burned</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon purple">⏱️</div>
+          <div class="stat-info">
+            <div class="stat-value" id="totalDuration">–</div>
+            <div class="stat-label">Total Minutes</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📅</div>
+          <div class="stat-info">
+            <div class="stat-value" id="todayGoalProgress">–</div>
+            <div class="stat-label">Today's Goal %</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="content-grid">
+        <!-- Recent Workouts -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🏃 Recent Workouts</div>
+            <button class="btn btn-primary btn-sm" id="addWorkoutBtn">+ Add</button>
+          </div>
+          <div id="recentWorkoutsList">
+            <div class="empty-state">
+              <div class="empty-icon">🏋️</div>
+              <p>No workouts yet. Add your first!</p>
+            </div>
+          </div>
+          <div class="pagination" id="workoutPagination"></div>
+        </div>
+
+        <!-- Quick Actions + Today's Goal -->
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          <!-- Today's Goal -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">📅 Today's Goal</div>
+              <a href="goal.html" class="btn btn-secondary btn-sm">Manage</a>
+            </div>
+            <div id="todayGoalCard">
+              <div class="empty-state">
+                <div class="empty-icon">🎯</div>
+                <p>No goal set for today.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Water Tracker -->
+          <div class="card" style="padding-bottom:1.5rem;">
+            <div class="card-header" style="margin-bottom: 1rem;">
+              <div class="card-title">💧 Daily Hydration</div>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-size: 0.9rem; color: var(--text-muted);">Goal: 8 Glasses</span>
+              <span style="font-weight: 600; color: var(--neon-green);" id="waterCount">0 / 8</span>
+            </div>
+            <div class="progress-bar-track" style="margin-bottom: 15px;">
+              <div class="progress-bar-fill" id="waterProgress" style="width: 0%; background: var(--blue-500); box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);"></div>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="updateWater(-1)">-</button>
+              <button class="btn btn-outline btn-sm" style="flex:2; border-color: var(--blue-500); color: var(--blue-500);" onclick="updateWater(1)">+ Add Glass</button>
+            </div>
+          </div>
+
+          <!-- Quick Links -->
+          <div class="card">
+            <div class="card-title" style="margin-bottom:1rem;">⚡ Quick Actions</div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <a href="goal.html" class="btn btn-secondary" style="justify-content:flex-start; gap:10px;">📅 Set Today's Goal</a>
+              <a href="ai.html" class="btn btn-secondary" style="justify-content:flex-start; gap:10px;">🧠 Get AI Fitness Plan</a>
+              <a href="chat.html" class="btn btn-secondary" style="justify-content:flex-start; gap:10px;">💬 Join Community Chat</a>
+              <a href="profile.html" class="btn btn-secondary" style="justify-content:flex-start; gap:10px;">👤 Update My Profile</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphs Section -->
+      <div class="graphs-section card mt-3">
+        <div class="card-header">
+          <div class="card-title">📈 Analytics</div>
+        </div>
+        <div class="graphs-grid">
+          <div class="graph-card">
+            <canvas id="calorieChart"></canvas>
+          </div>
+          <div class="graph-card">
+            <canvas id="workoutChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Add/Edit Workout Modal -->
+  <div class="modal-overlay" id="workoutModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">Add Workout</h3>
+        <button class="modal-close" id="closeModal">✕</button>
+      </div>
+      <div class="alert alert-error" id="workoutError"></div>
+      <form id="workoutForm" novalidate>
+        <input type="hidden" id="workoutId" />
+        <div class="form-group">
+          <label class="form-label">Workout Title *</label>
+          <input type="text" id="workoutTitle" class="form-control" placeholder="e.g. Morning Run" required />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Type *</label>
+            <select id="workoutType" class="form-control" required>
+              <option value="">Select type</option>
+              <option value="cardio">Cardio</option>
+              <option value="strength">Strength</option>
+              <option value="flexibility">Flexibility</option>
+              <option value="hiit">HIIT</option>
+              <option value="yoga">Yoga</option>
+              <option value="sports">Sports</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="workoutDate" class="form-control" />
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+          <div class="form-group">
+            <label class="form-label">Duration (min) *</label>
+            <input type="number" id="workoutDuration" class="form-control" placeholder="30" min="1" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Calories Burned *</label>
+            <input type="number" id="workoutCalories" class="form-control" placeholder="250" min="0" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes</label>
+          <textarea id="workoutNotes" class="form-control" placeholder="Optional notes..."></textarea>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button type="button" class="btn btn-secondary" id="cancelModal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveWorkoutBtn">Save Workout</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>

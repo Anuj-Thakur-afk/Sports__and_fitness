@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Daily Goals – FitLife</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .goal-date-nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .goal-date-nav input[type="date"] {
+      padding: 8px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .goal-date-nav input[type="date"]:focus { border-color: var(--green-400); }
+    .big-progress {
+      text-align: center;
+      padding: 2rem 0;
+    }
+    .big-progress .progress-number {
+      font-size: 3rem;
+      font-weight: 800;
+      font-family: 'Fraunces', serif;
+      color: var(--green-600);
+      line-height: 1;
+    }
+    .big-progress .progress-subtitle { color: var(--gray-500); font-size: 0.875rem; margin-top: 4px; }
+    .progress-bar-large { height: 18px; border-radius: 18px; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand"><div class="logo-icon">💪</div>FitLife</div>
+    <ul class="navbar-nav">
+      <li><a href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+      <li><a href="goal.html" class="active"><span class="nav-icon">📅</span> Goals</a></li>
+      <li><a href="ai.html"><span class="nav-icon">🧠</span> AI Coach</a></li>
+      <li><a href="chat.html"><span class="nav-icon">💬</span> Chat</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <span id="navUserName" style="font-size:0.875rem; color:var(--gray-500); font-weight:500;"></span>
+      <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <ul class="sidebar-nav">
+        <li><span class="sidebar-section">Main</span></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+        <li><span class="sidebar-section">Fitness</span></li>
+        <li><a href="goal.html" class="active"><span class="nav-icon">📅</span> Daily Goals</a></li>
+        <li><a href="ai.html"><span class="nav-icon">🧠</span> AI Coach</a></li>
+        <li><a href="chat.html"><span class="nav-icon">💬</span> Community Chat</a></li>
+        <li><a href="calculators.html"><span class="nav-icon">🧮</span> Calculators</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Daily Goal Tracker 📅</h1>
+        <p>Set your calorie goal and track progress throughout the day</p>
+      </div>
+
+      <!-- Date Navigation -->
+      <div class="goal-date-nav">
+        <label style="font-weight:600; font-size:0.875rem; color:var(--gray-600);">Viewing date:</label>
+        <input type="date" id="goalDate" />
+        <button class="btn btn-secondary btn-sm" id="todayBtn">Today</button>
+      </div>
+
+      <div class="content-grid">
+        <!-- Progress Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">🎯 Progress Overview</div>
+            <span id="goalDateLabel" style="font-size:0.8rem; color:var(--gray-500);"></span>
+          </div>
+
+          <div class="big-progress">
+            <div class="progress-number" id="progressPct">0%</div>
+            <div class="progress-subtitle">of daily calorie goal</div>
+          </div>
+
+          <div class="progress-container" style="margin:0.5rem 0 1.5rem;">
+            <div class="progress-label">
+              <span id="progressLabel">0 / 0 kcal</span>
+              <span id="progressStatus" style="font-weight:700;"></span>
+            </div>
+            <div class="progress-bar-track progress-bar-large">
+              <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div id="noGoalMsg" style="display:none;" class="empty-state">
+            <div class="empty-icon">🎯</div>
+            <p>No goal set for this date. Use the form to create one.</p>
+          </div>
+        </div>
+
+        <!-- Set Goal Form -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">⚙️ Set / Update Goal</div>
+          </div>
+
+          <div class="alert alert-error" id="goalError"></div>
+          <div class="alert alert-success" id="goalSuccess"></div>
+
+          <form id="goalForm" novalidate>
+            <div class="form-group">
+              <label class="form-label">Daily Calorie Goal (kcal) *</label>
+              <input type="number" id="calorieGoal" class="form-control" placeholder="e.g. 2000" min="100" max="10000" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Current Progress (kcal burned)</label>
+              <input type="number" id="calorieProgress" class="form-control" placeholder="e.g. 450" min="0" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Notes</label>
+              <textarea id="goalNotes" class="form-control" placeholder="Optional notes for today..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Save Goal</button>
+          </form>
+
+          <hr class="divider" />
+
+          <!-- Quick update progress -->
+          <div class="card-title" style="margin-bottom:1rem;">⚡ Quick Update Progress</div>
+          <div style="display:flex; gap:8px;">
+            <input type="number" id="quickProgress" class="form-control" placeholder="Add calories burned..." />
+            <button class="btn btn-orange" id="updateProgressBtn">Add</button>
+          </div>
+          <p style="font-size:0.78rem; color:var(--gray-400); margin-top:6px;">Adds to your existing progress</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/main.js"></script>
+  <script src="js/goal.js"></script>
+</body>
+</html>

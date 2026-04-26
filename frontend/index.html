@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FitLife – Sports & Fitness Management</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body {
+      background-image: radial-gradient(circle at 50% -20%, rgba(190, 242, 100, 0.1) 0%, var(--bg-dark) 50%);
+    }
+    
+    .hero {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 2rem;
+      position: relative;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+    }
+
+    .hero h1 {
+      font-size: 5.5rem;
+      line-height: 0.95;
+      margin-bottom: 2rem;
+      letter-spacing: -2px;
+      text-transform: none;
+    }
+
+    .hero h1 span.neon {
+      color: var(--neon-green);
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      margin-bottom: 3.5rem;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero .btn-primary {
+      padding: 16px 36px;
+      font-size: 1.1rem;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    /* Keep features hidden or styled appropriately for later, or remove if the focus is just the hero */
+    .features-section { display: none; } 
+
+    @media (max-width: 768px) {
+      .hero h1 { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      FitLife <span class="dot"></span>
+    </div>
+    <ul class="navbar-nav">
+      <li><a href="#">Features</a></li>
+      <li><a href="#">How It Works</a></li>
+      <li><a href="login.html">Login</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="register.html" class="btn btn-primary">Get Started →</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Ready to transform<br>your <span class="neon">fitness</span> journey?</h1>
+      <p>Join FitLife today — completely free to start.</p>
+      <div class="hero-actions">
+        <a href="register.html" class="btn btn-primary">Create Your Account →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border-color); font-size: 0.9rem;">
+    &copy; 2026 <span class="text-neon">FitLife</span> • Built with Node.js, Express, MongoDB
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

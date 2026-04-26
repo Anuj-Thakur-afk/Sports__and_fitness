@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register – FitLife</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-left">
+      <div class="auth-left-content">
+        <div style="font-size:3.5rem; margin-bottom:1rem;">🌿</div>
+        <h1>Join FitLife</h1>
+        <p>Start your fitness journey today. Free forever, no credit card needed.</p>
+        <ul class="auth-features">
+          <li>Unlimited workout logging</li>
+          <li>AI-powered fitness advice</li>
+          <li>Daily goal tracking</li>
+          <li>Community chat access</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="auth-right">
+      <div class="auth-box">
+        <h2>Create Account 🚀</h2>
+        <p class="auth-subtitle">Sign up and start your fitness journey</p>
+
+        <div class="alert alert-error" id="registerError"></div>
+        <div class="alert alert-success" id="registerSuccess"></div>
+
+        <form id="registerForm" novalidate>
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input type="text" id="name" class="form-control" placeholder="John Doe" required />
+            <div class="form-error" id="nameError">Name is required.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" class="form-control" placeholder="you@example.com" required />
+            <div class="form-error" id="emailError">Please enter a valid email.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" class="form-control" placeholder="Min. 6 characters" required />
+            <div class="form-error" id="passwordError">Password must be at least 6 characters.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat password" required />
+            <div class="form-error" id="confirmPasswordError">Passwords do not match.</div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="registerBtn">
+            Create Account
+          </button>
+        </form>
+
+        <div class="auth-link">
+          Already have an account? <a href="login.html">Sign in →</a>
+        </div>
+        <div class="auth-link mt-1">
+          <a href="index.html">← Back to Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

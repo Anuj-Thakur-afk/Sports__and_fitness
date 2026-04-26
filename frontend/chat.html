@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Community Chat – FitLife</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .chat-online-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; color: var(--green-600); font-weight: 600;
+    }
+    .online-dot {
+      width: 8px; height: 8px;
+      background: var(--neon-green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+    .chat-wrapper { max-width: 750px; }
+    .chat-header-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chat-header-bar h3 { font-size: 1rem; font-weight: 700; }
+    .system-msg {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--gray-400);
+      padding: 4px 0;
+    }
+    .username-area {
+      background: rgba(190, 242, 100, 0.05);
+      border: 1px solid rgba(190, 242, 100, 0.15);
+      border-radius: var(--radius-md);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+    }
+    .username-area strong { color: var(--neon-green); }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand"><div class="logo-icon">💪</div>FitLife</div>
+    <ul class="navbar-nav">
+      <li><a href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+      <li><a href="goal.html"><span class="nav-icon">📅</span> Goals</a></li>
+      <li><a href="ai.html"><span class="nav-icon">🧠</span> AI Coach</a></li>
+      <li><a href="chat.html" class="active"><span class="nav-icon">💬</span> Chat</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <span id="navUserName" style="font-size:0.875rem; color:var(--gray-500); font-weight:500;"></span>
+      <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <ul class="sidebar-nav">
+        <li><span class="sidebar-section">Main</span></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+        <li><span class="sidebar-section">Fitness</span></li>
+        <li><a href="goal.html"><span class="nav-icon">📅</span> Daily Goals</a></li>
+        <li><a href="ai.html"><span class="nav-icon">🧠</span> AI Coach</a></li>
+        <li><a href="chat.html" class="active"><span class="nav-icon">💬</span> Community Chat</a></li>
+        <li><a href="calculators.html"><span class="nav-icon">🧮</span> Calculators</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>Community Chat 💬</h1>
+        <p>Connect and motivate each other in real-time</p>
+      </div>
+
+      <div class="chat-wrapper">
+        <!-- Username info -->
+        <div class="username-area">
+          <span>💬</span>
+          Chatting as: <strong id="chatUsername">Loading...</strong>
+          <span style="margin-left:auto;" class="chat-online-badge">
+            <div class="online-dot"></div> Live
+          </span>
+        </div>
+
+        <!-- Chat UI -->
+        <div class="chat-header-bar">
+          <h3>🏋️ FitLife Community</h3>
+          <span style="font-size:0.78rem; color:var(--gray-400);">Last 20 messages shown</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+          <div class="system-msg">Welcome to FitLife Community Chat! 👋</div>
+        </div>
+
+        <div class="chat-input-area">
+          <input
+            type="text"
+            id="chatInput"
+            placeholder="Type a message and press Enter..."
+            maxlength="300"
+            autocomplete="off"
+          />
+          <button class="btn btn-primary" id="sendBtn">Send</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- Socket.IO client -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/chat.js"></script>
+</body>
+</html>

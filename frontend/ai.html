@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Coach – FitLife</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .ai-hero {
+      background: linear-gradient(135deg, var(--green-600), var(--green-500));
+      border-radius: var(--radius-xl);
+      padding: 2rem;
+      color: white;
+      margin-bottom: 1.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-hero::after {
+      content: '🧠';
+      position: absolute;
+      right: 2rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: 5rem;
+      opacity: 0.2;
+    }
+    .ai-hero h2 { color: white; font-size: 1.5rem; margin-bottom: 6px; }
+    .ai-hero p { opacity: 0.9; font-size: 0.9rem; }
+    .suggestion-section { margin-bottom: 1rem; }
+    .suggestion-section h4 {
+      font-weight: 700;
+      color: var(--green-700);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .history-item {
+      border: 1.5px solid var(--gray-100);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+      background: var(--gray-50);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .history-item:hover { border-color: var(--green-300); background: var(--green-50); }
+    .history-item .history-meta { font-size: 0.78rem; color: var(--gray-400); margin-bottom: 4px; }
+    .history-item .history-title { font-weight: 600; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-brand"><div class="logo-icon">💪</div>FitLife</div>
+    <ul class="navbar-nav">
+      <li><a href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+      <li><a href="goal.html"><span class="nav-icon">📅</span> Goals</a></li>
+      <li><a href="ai.html" class="active"><span class="nav-icon">🧠</span> AI Coach</a></li>
+      <li><a href="chat.html"><span class="nav-icon">💬</span> Chat</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <span id="navUserName" style="font-size:0.875rem; color:var(--gray-500); font-weight:500;"></span>
+      <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
+    </div>
+  </nav>
+
+  <div class="page-layout">
+    <aside class="sidebar">
+      <ul class="sidebar-nav">
+        <li><span class="sidebar-section">Main</span></li>
+        <li><a href="dashboard.html"><span class="nav-icon">📊</span> Dashboard</a></li>
+        <li><a href="profile.html"><span class="nav-icon">👤</span> Profile</a></li>
+        <li><span class="sidebar-section">Fitness</span></li>
+        <li><a href="goal.html"><span class="nav-icon">📅</span> Daily Goals</a></li>
+        <li><a href="ai.html" class="active"><span class="nav-icon">🧠</span> AI Coach</a></li>
+        <li><a href="chat.html"><span class="nav-icon">💬</span> Community Chat</a></li>
+        <li><a href="calculators.html"><span class="nav-icon">🧮</span> Calculators</a></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1>AI Fitness Coach 🧠</h1>
+        <p>Get a personalized workout plan and diet suggestion powered by AI</p>
+      </div>
+
+      <!-- AI Hero Banner -->
+      <div class="ai-hero">
+        <h2>Your Personal AI Trainer</h2>
+        <p>Tell us your goal and we'll generate a custom weekly workout plan + diet recommendations tailored just for you.</p>
+      </div>
+
+      <div class="content-grid">
+        <!-- Input Form -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">📋 Your Details</div>
+          </div>
+
+          <div class="alert alert-error" id="aiError"></div>
+
+          <form id="aiForm" novalidate>
+            <div class="form-group">
+              <label class="form-label">Fitness Goal *</label>
+              <select id="aiGoal" class="form-control" required>
+                <option value="">Select your goal</option>
+                <option value="lose_weight">🔥 Lose Weight</option>
+                <option value="gain_muscle">💪 Gain Muscle</option>
+                <option value="maintain">⚖️ Maintain Weight</option>
+                <option value="improve_endurance">🏃 Improve Endurance</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Age *</label>
+              <input type="number" id="aiAge" class="form-control" placeholder="e.g. 28" min="10" max="100" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Activity Level *</label>
+              <select id="aiActivity" class="form-control" required>
+                <option value="">Select activity level</option>
+                <option value="sedentary">😴 Sedentary (little/no exercise)</option>
+                <option value="light">🚶 Light (1-3 days/week)</option>
+                <option value="moderate">🏃 Moderate (3-5 days/week)</option>
+                <option value="active">⚡ Active (6-7 days/week)</option>
+                <option value="very_active">🔥 Very Active (2x/day)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn btn-orange btn-block" id="generateBtn">
+              🧠 Generate My Plan
+            </button>
+          </form>
+
+          <hr class="divider" />
+
+          <!-- Past Suggestions -->
+          <div class="card-title" style="margin-bottom:1rem;">🕒 Past Suggestions</div>
+          <div id="historyList">
+            <div class="empty-state"><div class="empty-icon">📋</div><p>No history yet.</p></div>
+          </div>
+        </div>
+
+        <!-- Output -->
+        <div>
+          <!-- Loading state -->
+          <div class="card" id="loadingCard" style="display:none;">
+            <div class="ai-loading">
+              <div class="spinner"></div>
+              Generating your personalized plan...
+            </div>
+            <p style="font-size:0.8rem; color:var(--gray-400); padding:0 1rem 1rem;">This may take a few seconds ✨</p>
+          </div>
+
+          <!-- Result card -->
+          <div id="resultCard" style="display:none;">
+            <div class="card" style="margin-bottom:1.25rem;">
+              <div class="card-header">
+                <div class="card-title">🏋️ Your Workout Plan</div>
+                <button class="btn btn-secondary btn-sm" id="copyWorkoutBtn">Copy</button>
+              </div>
+              <div class="suggestion-box" id="workoutPlanOutput"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">🥗 Diet Suggestions</div>
+                <button class="btn btn-secondary btn-sm" id="copyDietBtn">Copy</button>
+              </div>
+              <div class="suggestion-box" id="dietSuggestionOutput"></div>
+            </div>
+          </div>
+
+          <!-- Initial state -->
+          <div class="card" id="initialCard">
+            <div class="empty-state" style="padding:3rem 1rem;">
+              <div class="empty-icon">🤖</div>
+              <p style="font-size:1rem; font-weight:600; color:var(--gray-600);">Your plan will appear here</p>
+              <p style="margin-top:8px;">Fill in the form and click <strong>Generate My Plan</strong> to get started.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/main.js"></script>
+  <script src="js/ai.js"></script>
+</body>
+</html>
