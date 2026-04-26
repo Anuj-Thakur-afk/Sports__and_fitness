@@ -1,7 +1,7 @@
 import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
-import mongoose from 'mongoose';
+
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
@@ -26,8 +26,8 @@ const io = new Server(httpServer, {
 app.use(cors());
 app.use(express.json());
 
-// 1. Basic test route
-app.get('/', (req, res) => {
+// 1. Basic test route (Health Check)
+app.get('/api/health', (req, res) => {
   res.status(200).send('🚀 FitLife API is live and running perfectly on Render.');
 });
 
@@ -72,30 +72,8 @@ io.on('connection', (socket) => {
   });
 });
 
-// 4. Database Connection Logic
-const connectDB = async () => {
-  const MONGO_URI = process.env.MONGO_URI;
-
-  if (!MONGO_URI) {
-    console.error('❌ FATAL ERROR: MONGO_URI is undefined.');
-    console.error('Set MONGO_URI in your Render environment variables or local .env file.');
-    process.exit(1);
-  }
-
-  try {
-    console.log('🔄 Connecting to MongoDB...');
-    const conn = await mongoose.connect(MONGO_URI);
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Failed: ${error.message}`);
-    process.exit(1);
-  }
-};
-
 // 5. Start Server
-const startServer = async () => {
-  await connectDB();
-
+const startServer = () => {
   const PORT = process.env.PORT || 5000;
   httpServer.listen(PORT, () => {
     console.log(`🚀 FitLife Server running on port ${PORT}`);

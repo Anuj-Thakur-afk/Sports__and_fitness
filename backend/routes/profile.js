@@ -1,6 +1,6 @@
 // /backend/routes/profile.js
 import express from 'express';
-import User from '../models/User.js';
+import { supabase } from '../config/supabase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -12,8 +12,29 @@ router.use(protect);
 // @access Private
 router.get('/', async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
-    res.json({ success: true, profile: user });
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, name, email, age, weight, height, fitness_goal, activity_level, created_at, updated_at')
+      .eq('id', req.user.id)
+      .single();
+
+    if (error) throw error;
+
+    // Convert keys for frontend compatibility
+    const profile = {
+      _id: user.id,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      age: user.age,
+      weight: user.weight,
+      height: user.height,
+      fitnessGoal: user.fitness_goal,
+      activityLevel: user.activity_level,
+      createdAt: user.created_at
+    };
+
+    res.json({ success: true, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
   }
@@ -32,15 +53,32 @@ router.put('/', async (req, res) => {
     if (age !== undefined) updates.age = age;
     if (weight !== undefined) updates.weight = weight;
     if (height !== undefined) updates.height = height;
-    if (fitnessGoal !== undefined) updates.fitnessGoal = fitnessGoal;
-    if (activityLevel !== undefined) updates.activityLevel = activityLevel;
+    if (fitnessGoal !== undefined) updates.fitness_goal = fitnessGoal;
+    if (activityLevel !== undefined) updates.activity_level = activityLevel;
 
-    const user = await User.findByIdAndUpdate(req.user._id, updates, {
-      new: true,
-      runValidators: true,
-    }).select('-password');
+    const { data: user, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', req.user.id)
+      .select('id, name, email, age, weight, height, fitness_goal, activity_level, created_at, updated_at')
+      .single();
 
-    res.json({ success: true, profile: user });
+    if (error) throw error;
+
+    const profile = {
+      _id: user.id,
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      age: user.age,
+      weight: user.weight,
+      height: user.height,
+      fitnessGoal: user.fitness_goal,
+      activityLevel: user.activity_level,
+      createdAt: user.created_at
+    };
+
+    res.json({ success: true, profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

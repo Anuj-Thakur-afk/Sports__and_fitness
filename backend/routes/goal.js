@@ -1,6 +1,6 @@
 // /backend/routes/goal.js
 import express from 'express';
-import Goal from '../models/Goal.js';
+import { supabase } from '../config/supabase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -13,7 +13,15 @@ router.use(protect);
 router.get('/', async (req, res) => {
   try {
     const date = req.query.date || new Date().toISOString().split('T')[0];
-    const goal = await Goal.findOne({ user: req.user._id, date });
+    const { data: goal, error } = await supabase
+      .from('goals')
+      .select('id, _id:id, date, calorieGoal:calorie_goal, calorieProgress:calorie_progress, notes, createdAt:created_at')
+      .eq('user_id', req.user.id)
+      .eq('date', date)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
+
     res.json({ success: true, goal: goal || null });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server error' });
@@ -34,11 +42,19 @@ router.post('/', async (req, res) => {
     const targetDate = date || new Date().toISOString().split('T')[0];
 
     // Upsert: update if exists, create if not
-    const goal = await Goal.findOneAndUpdate(
-      { user: req.user._id, date: targetDate },
-      { calorieGoal, calorieProgress: calorieProgress || 0, notes: notes || '' },
-      { new: true, upsert: true, runValidators: true }
-    );
+    const { data: goal, error } = await supabase
+      .from('goals')
+      .upsert({
+        user_id: req.user.id,
+        date: targetDate,
+        calorie_goal: calorieGoal,
+        calorie_progress: calorieProgress || 0,
+        notes: notes || ''
+      }, { onConflict: 'user_id,date' })
+      .select('id, _id:id, date, calorieGoal:calorie_goal, calorieProgress:calorie_progress, notes, createdAt:created_at')
+      .single();
+
+    if (error) throw error;
 
     res.json({ success: true, goal });
   } catch (error) {
@@ -58,14 +74,17 @@ router.put('/progress', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Progress value is required' });
     }
 
-    const goal = await Goal.findOneAndUpdate(
-      { user: req.user._id, date: targetDate },
-      { calorieProgress },
-      { new: true }
-    );
+    const { data: goal, error } = await supabase
+      .from('goals')
+      .update({ calorie_progress: calorieProgress })
+      .eq('user_id', req.user.id)
+      .eq('date', targetDate)
+      .select('id, _id:id, date, calorieGoal:calorie_goal, calorieProgress:calorie_progress, notes, createdAt:created_at')
+      .single();
 
-    if (!goal) {
-      return res.status(404).json({ success: false, message: 'No goal set for this date' });
+    if (error) {
+       if (error.code === 'PGRST116') return res.status(404).json({ success: false, message: 'No goal set for this date' });
+       throw error;
     }
 
     res.json({ success: true, goal });

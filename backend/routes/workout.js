@@ -1,6 +1,6 @@
 // /backend/routes/workout.js
 import express from 'express';
-import Workout from '../models/Workout.js';
+import { supabase } from '../config/supabase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -17,24 +17,27 @@ router.get('/', async (req, res) => {
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
 
-    const total = await Workout.countDocuments({ user: req.user._id });
-    const workouts = await Workout.find({ user: req.user._id })
-      .sort({ date: -1 })
-      .skip(skip)
-      .limit(limit);
+    const { data: workouts, count: total, error } = await supabase
+      .from('workouts')
+      .select('id, _id:id, title, type, duration, caloriesBurned:calories_burned, notes, date, createdAt:created_at', { count: 'exact' })
+      .eq('user_id', req.user.id)
+      .order('date', { ascending: false })
+      .range(skip, skip + limit - 1);
+
+    if (error) throw error;
 
     res.json({
       success: true,
       workouts,
       pagination: {
-        total,
+        total: total || 0,
         page,
-        pages: Math.ceil(total / limit),
+        pages: Math.ceil((total || 0) / limit),
         limit,
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -43,22 +46,23 @@ router.get('/', async (req, res) => {
 // @access Private
 router.get('/stats', async (req, res) => {
   try {
-    const stats = await Workout.aggregate([
-      { $match: { user: req.user._id } },
-      {
-        $group: {
-          _id: null,
-          totalWorkouts: { $sum: 1 },
-          totalCalories: { $sum: '$caloriesBurned' },
-          totalDuration: { $sum: '$duration' },
-        },
-      },
-    ]);
+    const { data: workouts, error } = await supabase
+      .from('workouts')
+      .select('calories_burned, duration')
+      .eq('user_id', req.user.id);
 
-    const data = stats[0] || { totalWorkouts: 0, totalCalories: 0, totalDuration: 0 };
-    res.json({ success: true, stats: data });
+    if (error) throw error;
+
+    const stats = workouts.reduce((acc, w) => {
+      acc.totalWorkouts += 1;
+      acc.totalCalories += Number(w.calories_burned || 0);
+      acc.totalDuration += Number(w.duration || 0);
+      return acc;
+    }, { totalWorkouts: 0, totalCalories: 0, totalDuration: 0 });
+
+    res.json({ success: true, stats });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -73,15 +77,21 @@ router.post('/', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Title, type, duration, and calories are required' });
     }
 
-    const workout = await Workout.create({
-      user: req.user._id,
-      title,
-      type,
-      duration,
-      caloriesBurned,
-      notes,
-      date: date || Date.now(),
-    });
+    const { data: workout, error } = await supabase
+      .from('workouts')
+      .insert([{
+        user_id: req.user.id,
+        title,
+        type,
+        duration,
+        calories_burned: caloriesBurned,
+        notes,
+        date: date ? new Date(date).toISOString() : new Date().toISOString()
+      }])
+      .select('id, _id:id, title, type, duration, caloriesBurned:calories_burned, notes, date, createdAt:created_at')
+      .single();
+
+    if (error) throw error;
 
     res.status(201).json({ success: true, workout });
   } catch (error) {
@@ -94,18 +104,25 @@ router.post('/', async (req, res) => {
 // @access Private
 router.put('/:id', async (req, res) => {
   try {
-    let workout = await Workout.findById(req.params.id);
-    if (!workout) return res.status(404).json({ success: false, message: 'Workout not found' });
-
-    // Ensure user owns this workout
-    if (workout.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Not authorized' });
+    // Map frontend camelCase to snake_case
+    const updates = { ...req.body };
+    if (updates.caloriesBurned !== undefined) {
+      updates.calories_burned = updates.caloriesBurned;
+      delete updates.caloriesBurned;
     }
 
-    workout = await Workout.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const { data: workout, error } = await supabase
+      .from('workouts')
+      .update(updates)
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id)
+      .select('id, _id:id, title, type, duration, caloriesBurned:calories_burned, notes, date, createdAt:created_at')
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return res.status(404).json({ success: false, message: 'Workout not found or unauthorized' });
+      throw error;
+    }
 
     res.json({ success: true, workout });
   } catch (error) {
@@ -118,14 +135,14 @@ router.put('/:id', async (req, res) => {
 // @access Private
 router.delete('/:id', async (req, res) => {
   try {
-    const workout = await Workout.findById(req.params.id);
-    if (!workout) return res.status(404).json({ success: false, message: 'Workout not found' });
+    const { error } = await supabase
+      .from('workouts')
+      .delete()
+      .eq('id', req.params.id)
+      .eq('user_id', req.user.id);
 
-    if (workout.user.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ success: false, message: 'Not authorized' });
-    }
+    if (error) throw error;
 
-    await workout.deleteOne();
     res.json({ success: true, message: 'Workout deleted' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

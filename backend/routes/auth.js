@@ -1,7 +1,8 @@
 // /backend/routes/auth.js
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import bcrypt from 'bcryptjs';
+import { supabase } from '../config/supabase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -27,18 +28,33 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if user exists
-    const existingUser = await User.findOne({ email });
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email already in use' });
     }
 
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     // Create user
-    const user = await User.create({ name, email, password });
+    const { data: user, error } = await supabase
+      .from('users')
+      .insert([{ name, email, password: hashedPassword }])
+      .select()
+      .single();
+
+    if (error) throw error;
 
     res.status(201).json({
       success: true,
-      token: generateToken(user._id),
-      user: { id: user._id, name: user.name, email: user.email },
+      token: generateToken(user.id),
+      user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (error) {
     console.error(error);
@@ -57,21 +73,26 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, message: 'Email and password required' });
     }
 
-    // Find user and include password for comparison
-    const user = await User.findOne({ email }).select('+password');
-    if (!user) {
+    // Find user
+    const { data: user, error } = await supabase
+      .from('users')
+      .select('id, name, email, password')
+      .eq('email', email)
+      .single();
+
+    if (error || !user) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
-    const isMatch = await user.matchPassword(password);
+    const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     res.json({
       success: true,
-      token: generateToken(user._id),
-      user: { id: user._id, name: user.name, email: user.email },
+      token: generateToken(user.id),
+      user: { id: user.id, name: user.name, email: user.email },
     });
   } catch (error) {
     console.error(error);

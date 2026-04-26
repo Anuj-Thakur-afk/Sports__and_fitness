@@ -1,7 +1,7 @@
 // /backend/routes/ai.js
 import express from 'express';
 import OpenAI from 'openai';
-import Suggestion from '../models/Suggestion.js';
+import { supabase } from '../config/supabase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -57,14 +57,20 @@ Keep it practical, motivating, and safe.`;
     }
 
     // Save suggestion to DB
-    const suggestion = await Suggestion.create({
-      user: req.user._id,
-      goal,
-      age,
-      activityLevel,
-      workoutPlan,
-      dietSuggestion,
-    });
+    const { data: suggestion, error } = await supabase
+      .from('suggestions')
+      .insert([{
+        user_id: req.user.id,
+        goal,
+        age,
+        activity_level: activityLevel,
+        workout_plan: workoutPlan,
+        diet_suggestion: dietSuggestion
+      }])
+      .select('id, _id:id, goal, age, activityLevel:activity_level, workoutPlan:workout_plan, dietSuggestion:diet_suggestion, createdAt:created_at')
+      .single();
+
+    if (error) throw error;
 
     res.json({ success: true, suggestion });
   } catch (error) {
@@ -78,12 +84,18 @@ Keep it practical, motivating, and safe.`;
 // @access Private
 router.get('/history', async (req, res) => {
   try {
-    const suggestions = await Suggestion.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
+    const { data: suggestions, error } = await supabase
+      .from('suggestions')
+      .select('id, _id:id, goal, age, activityLevel:activity_level, workoutPlan:workout_plan, dietSuggestion:diet_suggestion, createdAt:created_at')
+      .eq('user_id', req.user.id)
+      .order('created_at', { ascending: false })
       .limit(5);
+
+    if (error) throw error;
+
     res.json({ success: true, suggestions });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
