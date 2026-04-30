@@ -28,6 +28,21 @@
   --shadow-neon: 0 0 20px rgba(190, 242, 100, 0.15);
 }
 
+/* ===== Light Theme Overrides ===== */
+[data-theme="light"] {
+  --bg-dark: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-input: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --neon-green: #65a30d;
+  --neon-green-hover: #4d7c0f;
+  --neon-green-dark: #3f6212;
+  --border-color: rgba(0, 0, 0, 0.08);
+  
+  --shadow-neon: 0 4px 20px rgba(101, 163, 13, 0.15);
+}
+
 /* ===== Reset & Base ===== */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -110,6 +125,35 @@ h3 { font-size: 1.4rem; font-weight: 600; }
 }
 
 .navbar-actions { display: flex; align-items: center; gap: 16px; }
+
+/* ===== Theme Toggle ===== */
+.theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  transition: var(--transition);
+  font-size: 1.2rem;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+[data-theme="light"] .theme-toggle {
+  background: rgba(0, 0, 0, 0.05);
+}
+[data-theme="light"] .theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
 
 /* ===== Buttons ===== */
 .btn {

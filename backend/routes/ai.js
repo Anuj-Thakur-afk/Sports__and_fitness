@@ -1,10 +1,13 @@
 // /backend/routes/ai.js
 import express from 'express';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from '../config/supabase.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
+
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.use(protect);
 
@@ -13,46 +16,42 @@ router.use(protect);
 // @access Private
 router.post('/suggest', async (req, res) => {
   try {
-    const { goal, age, activityLevel } = req.body;
+    const { goal, age, activityLevel: activity } = req.body;
 
-    if (!goal || !age || !activityLevel) {
+    if (!goal || !age || !activity) {
       return res.status(400).json({ success: false, message: 'Goal, age, and activity level are required' });
     }
 
     let workoutPlan = '';
     let dietSuggestion = '';
 
-    // Try OpenAI if key is set
-    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here') {
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    // Try Gemini if key is set
+    if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'your_key') {
+      try {
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        
+        const prompt = `Provide a SHORT weekly workout plan and diet suggestion for a ${age} year old with a goal of "${goal}" and activity level "${activity}". 
+        Format:
+        Workout: [Short plan]
+        Diet: [Short suggestion]
+        Limit response to 500 characters.`;
 
-      const prompt = `You are a professional fitness trainer. Based on the following details, provide a personalized weekly workout plan and diet suggestion.
-      
-User Details:
-- Fitness Goal: ${goal}
-- Age: ${age} years
-- Activity Level: ${activityLevel}
+        const result = await model.generateContent(prompt);
+        const responseText = result.response.text();
 
-Please provide:
-1. A 7-day workout plan (detailed, day by day)
-2. A diet suggestion with meal ideas for breakfast, lunch, dinner, and snacks
-
-Keep it practical, motivating, and safe.`;
-
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 800,
-      });
-
-      const responseText = completion.choices[0].message.content;
-      // Split response into workout and diet parts
-      const parts = responseText.split(/diet suggestion|2\./i);
-      workoutPlan = parts[0] ? parts[0].replace(/1\.\s*/i, '').trim() : responseText;
-      dietSuggestion = parts[1] ? parts[1].trim() : 'See full response above.';
+        // Split response into workout and diet parts
+        const parts = responseText.split(/Diet:/i);
+        workoutPlan = parts[0] ? parts[0].replace(/Workout:/i, '').trim() : responseText;
+        dietSuggestion = parts[1] ? parts[1].trim() : 'Balanced nutrition plan recommended.';
+      } catch (apiError) {
+        console.error('Gemini API Error:', apiError.message);
+        // Fallback to mock data
+        workoutPlan = generateMockWorkoutPlan(goal, age, activity);
+        dietSuggestion = generateMockDiet(goal);
+      }
     } else {
-      // Fallback mock response when OpenAI key not set
-      workoutPlan = generateMockWorkoutPlan(goal, age, activityLevel);
+      // Fallback mock response when Gemini key not set
+      workoutPlan = generateMockWorkoutPlan(goal, age, activity);
       dietSuggestion = generateMockDiet(goal);
     }
 
@@ -63,7 +62,7 @@ Keep it practical, motivating, and safe.`;
         user_id: req.user.id,
         goal,
         age,
-        activity_level: activityLevel,
+        activity_level: activity,
         workout_plan: workoutPlan,
         diet_suggestion: dietSuggestion
       }])
@@ -99,7 +98,7 @@ router.get('/history', async (req, res) => {
   }
 });
 
-// --- Mock generators (used when OpenAI key is not set) ---
+// --- Mock generators (used when Gemini key is not set) ---
 
 function generateMockWorkoutPlan(goal, age, activityLevel) {
   const intensity = activityLevel === 'sedentary' ? 'Low' : activityLevel === 'active' ? 'High' : 'Moderate';

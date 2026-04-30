@@ -18,6 +18,43 @@ const clearAuth = () => {
   localStorage.removeItem('fitlife_user');
 };
 
+/* ===== Theme Management ===== */
+const getTheme = () => localStorage.getItem('fitlife_theme') || 'dark';
+const setTheme = (theme) => {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('fitlife_theme', theme);
+  updateThemeToggleIcon(theme);
+};
+
+const toggleTheme = () => {
+  const newTheme = getTheme() === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+};
+
+const updateThemeToggleIcon = (theme) => {
+  const icon = document.querySelector('.theme-toggle');
+  if (icon) {
+    icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+  }
+};
+
+const initTheme = () => {
+  const theme = getTheme();
+  setTheme(theme);
+  
+  // Auto-inject toggle button if navbar-actions exists
+  const actions = document.querySelector('.navbar-actions');
+  if (actions && !document.querySelector('.theme-toggle')) {
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'theme-toggle';
+    toggleBtn.type = 'button';
+    toggleBtn.title = 'Toggle Light/Dark Mode';
+    toggleBtn.onclick = toggleTheme;
+    toggleBtn.textContent = theme === 'dark' ? '🌙' : '☀️';
+    actions.prepend(toggleBtn);
+  }
+};
+
 /* ===== Auth Guard ===== */
 const requireAuth = () => {
   if (!getToken()) {
@@ -93,5 +130,6 @@ const todayStr = () => new Date().toISOString().split('T')[0];
 
 /* ===== Run on DOM ready ===== */
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   initNavbar();
 });
