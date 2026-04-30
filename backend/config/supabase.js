@@ -6,9 +6,12 @@ dotenv.config();
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 
+let supabase;
+
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ FATAL ERROR: SUPABASE_URL or SUPABASE_ANON_KEY is missing.');
-  process.exit(1);
+  console.warn('⚠️ WARNING: SUPABASE_URL or SUPABASE_ANON_KEY is missing. Database features will not work.');
+} else {
+  supabase = createClient(supabaseUrl, supabaseKey);
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export { supabase };
