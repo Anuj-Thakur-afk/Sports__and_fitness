@@ -2,7 +2,7 @@
 
 FitLife is a comprehensive sports and fitness management platform designed to help users track their health goals, manage workouts, and receive AI-powered coaching. With a sleek dark-themed interface and real-time interaction, FitLife provides a premium experience for fitness enthusiasts.
 
-## 🌟 Features
+##  Features
 
 - **AI-Powered Fitness Coach**: Integration with Google Gemini API to provide personalized workout and diet plans.
 - **Dynamic Dashboard**: Monitor your progress, upcoming goals, and daily statistics at a glance.
@@ -12,7 +12,7 @@ FitLife is a comprehensive sports and fitness management platform designed to he
 - **Secure Authentication**: User registration and login powered by Supabase and JWT.
 - **Responsive Design**: A modern, mobile-friendly UI built with pure HTML, CSS, and JavaScript.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - **HTML5 & CSS3**: Custom styles with a focus on modern aesthetics (dark mode, glassmorphism).
@@ -27,7 +27,7 @@ FitLife is a comprehensive sports and fitness management platform designed to he
 - **Socket.io**: Real-time server communication.
 - **JWT & Bcrypt**: Secure session management and password hashing.
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v14 or higher)
@@ -81,7 +81,7 @@ FitLife/
 └── README.md         # Project documentation
 ```
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! If you have suggestions or find bugs, please open an issue or submit a pull request.
 
